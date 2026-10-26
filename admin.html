@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Panel docente · Gen-Eco en Ruta</title><link rel="stylesheet" href="style.css">
+<style>table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{border:1px solid var(--ln);padding:4px;text-align:left}.tw{overflow-x:auto}</style></head>
+<body><div class="bg"></div><main>
+<section class="card" id="lg"><h1>Panel docente</h1>
+<p class="small">⚠️ Protección básica: la clave está en el código fuente y cualquiera con conocimientos técnicos puede descubrirla. No es seguridad profesional; no guardes aquí información sensible (por eso el juego solo usa códigos anónimos).</p>
+<label for="pw">Clave:</label> <input id="pw" type="password" style="text-transform:none"> <button onclick="ent()">Entrar</button> <a href="index.html" style="color:#9bbfc0">Volver al juego</a></section>
+<section class="card" id="pn" hidden><h2>Registros guardados en este navegador</h2>
+<p>⚠️ Los datos pertenecen a <b>este navegador y este dispositivo</b>. No se sincronizan con otros computadores y se pierden si se borran los datos del navegador. <b>Exporta después de cada sesión.</b></p>
+<p id="st"></p><button onclick="csv()">⬇ Exportar CSV</button><button onclick="jsn()">⬇ Respaldo JSON</button>
+<button class="sec" onclick="document.getElementById('fi').click()">⬆ Restaurar JSON</button><input id="fi" type="file" accept=".json" hidden onchange="imp(this)">
+<button class="sec" onclick="del()" style="border-color:#fb7185">🗑 Eliminar datos locales</button>
+<div class="tw"><table><thead><tr><th>Código</th><th>Inicio</th><th>Fin</th><th>Puntos</th><th>Insignias</th><th>Misiones (estado)</th><th>Alerta</th></tr></thead><tbody id="tb"></tbody></table></div></section></main>
+<script>
+const PW='GenEco2045',KR='ge_records';
+const L=()=>{try{return JSON.parse(localStorage.getItem(KR))||{}}catch(e){return{}}};
+const dl=(n,t,m)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click()};
+function ent(){if(pw.value===PW){lg.hidden=true;pn.hidden=false;draw()}else alert('Clave incorrecta')}
+function inc(r){const p=[];if(!r.fin)p.push('sin finalizar');Object.entries(r.misiones).forEach(([k,m])=>{if(m.estado==='abandonada')p.push('M'+k+' abandonada');if(m.estado==='completada'&&m.quiz.length<3)p.push('M'+k+' sin 3 preguntas')});return p}
+function draw(){const a=Object.values(L()),n=a.filter(r=>inc(r).length).length;st.textContent=a.length+' registro(s); '+n+' con posible estado incompleto.';
+tb.innerHTML=a.map(r=>`<tr><td>${r.code}</td><td>${r.inicio}</td><td>${r.fin||'—'}</td><td>${r.puntos}</td><td>${r.insignias.join(', ')}</td><td>${Object.entries(r.misiones).map(([k,m])=>'M'+k+': '+m.estado).join('<br>')}</td><td>${inc(r).join('; ')||'ok'}</td></tr>`).join('')}
+const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+function csv(){const rows=[['codigo','avatar','inicio','fin','mision','estado_mision','intentos','tiempo_s','tipo','item','respuesta','resultado','puntos']];
+Object.values(L()).forEach(r=>Object.entries(r.misiones).forEach(([k,m])=>{const b=[r.code,r.avatar,r.inicio,r.fin||'',k,m.estado,m.intentos,m.tiempo_s];
+if(!m.reto.length&&!m.quiz.length)rows.push([...b,'resumen','','',m.estado,m.puntos]);
+m.reto.forEach(x=>rows.push([...b,'reto',x.item,x.respuesta,x.resultado,x.puntos]));m.quiz.forEach(x=>rows.push([...b,'comprension',x.item,x.respuesta,x.resultado,x.puntos]))}));
+dl('geneco_registros.csv','\ufeff'+rows.map(r=>r.map(q).join(',')).join('\n'),'text/csv')}
+function jsn(){dl('geneco_respaldo.json',JSON.stringify(L(),null,1),'application/json')}
+function imp(f){const r=new FileReader();r.onload=()=>{try{const n=JSON.parse(r.result),o=L();localStorage.setItem(KR,JSON.stringify({...o,...n}));draw();alert('Respaldo restaurado (se combinó sin duplicar por id).')}catch(e){alert('Archivo no válido')}};r.readAsText(f.files[0])}
+function del(){if(prompt('Esto borra TODOS los registros locales. Exporta antes. Escribe ELIMINAR para confirmar:')==='ELIMINAR'){localStorage.removeItem(KR);localStorage.removeItem('ge_session');draw()}}
+</script></body></html>
