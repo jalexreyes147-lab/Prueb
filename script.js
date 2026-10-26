@@ -1,4 +1,4 @@
-'use strict';
+{'use strict';
 const $=s=>document.querySelector(s),app=$('#app'),KS='ge_session',KR='ge_records';
 const AV=['🦉','🐆','🦋','🐬','🌿','🦅'],BAD=['Separador Experto','Energía Limpia','Protector de Vida','Consumo Consciente'];
 const NOTA1='Nota: estos cuatro recipientes son una simplificación didáctica, no una norma universal. En Colombia la separación en la fuente sigue el código de colores vigente (Resolución 2184 de 2019: blanco para aprovechables, verde para orgánicos aprovechables y negro para no aprovechables). Verifica las orientaciones de tu localidad; los materiales deben estar limpios y secos para ser aprovechables.';
@@ -133,4 +133,4 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&
 app.addEventListener('dragstart',e=>{const t=e.target.closest('.it');if(t)e.dataTransfer.setData('text/plain',t.dataset.i)});
 app.addEventListener('dragover',e=>{if(e.target.closest('.bin'))e.preventDefault()});
 app.addEventListener('drop',e=>{const b=e.target.closest('.bin');if(b){e.preventDefault();ctx.place(+e.dataTransfer.getData('text/plain'),b.dataset.c)}});
-welcome();
+welcome();}
